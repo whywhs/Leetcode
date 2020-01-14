@@ -1,5 +1,5 @@
+#根据情况进行判断，回文串只有两种可能情况，一种是新的字符与前一字符相同构成回文，另一种是新的字符与前前一个字符相等三者构成回文
 class Solution(object):
-    import copy
     def partition(self, s):
         """
         :type s: str
