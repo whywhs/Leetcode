@@ -20,3 +20,25 @@ class Solution(object):
                         if result[j][-1]==result[j][-3]:
                             result.append(result[j][:len(result[j])-3]+[result[j][-1]+result[j][-2]+result[j][-3]])
         return result
+    
+#回溯法，记得if s==''中return回来的必须是[[]]，不然for mm in result_sub这一行是没有办法运行的
+class Solution(object):
+    def partition(self, s):
+        """
+        :type s: str
+        :rtype: List[List[str]]
+        """
+        def judge(s):
+            if s=='':
+                return [[]]
+            result = []
+            for i in range(len(s)):
+                if s[:i+1]==s[:i+1][::-1]:
+                    result_sub = judge(s[i+1:])
+                    for mm in result_sub:
+                        result.append([s[:i+1]]+mm)
+            
+            return result
+        
+        result = judge(s)
+        return result   
