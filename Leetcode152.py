@@ -1,3 +1,5 @@
+#为啥我写了这么长，好在时间上超过了100%的代码，还是比较欣慰的。。。
+#首先判断nums中有没有0，如果有0就将0分开。其次，通过判断最长的含有偶数个负数的list，该list的乘积就是最大的连续乘积
 class Solution(object):
     def maxProduct(self, nums):
         """
