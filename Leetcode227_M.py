@@ -1,3 +1,6 @@
+#基本计算器II。包含加减乘除但是不包含()的，做法就是采用栈来进行。对于乘法和除法的就直接在result[-1]上进行操作并覆盖。对于加法减法的就堆在result中。
+#最后，对所有的result进行相加求和。
+#注意的是除法。
 class Solution(object):
     def calculate(self, s):
         """
