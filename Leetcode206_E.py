@@ -36,4 +36,15 @@ class Solution(object):
             new = list_h
             list_h = pre
         return new
+    
+    
+        list_h = head
+        new = None
+        while(list_h):
+            new,new.next,list_h = list_h,new,list_h.next
+        return new
+    
+            
+        
+    
             
