@@ -27,8 +27,6 @@ class Solution(object):
     def my_list(self,root):
         if not root :
             return []
-        if not root.left and not root.right:
-            return [root.val]
         else:
             result_left = self.my_list(root.left)
             result_right = self.my_list(root.right)
