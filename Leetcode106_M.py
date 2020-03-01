@@ -14,35 +14,46 @@ class Solution(object):
         :type postorder: List[int]
         :rtype: TreeNode
         """
-        if len(inorder)==0:
+        if inorder==[]:
             return None
-        elif len(inorder)==1:
-            node = inorder.pop(0)
-            return TreeNode(node)
-                
-        if inorder[0]==postorder[0]:
-            postorder.pop(0)
-            left = TreeNode(inorder.pop(0))
-            mid = TreeNode(inorder.pop(0))
-            mid.left = left
-        else:
-            mid = TreeNode(inorder.pop(0))
-            mid.left = None 
-        if inorder==[]: return mid
+        len_p = len(postorder)
+        mid = postorder[-1]
+        index = inorder.index(mid)
+        left = self.buildTree(inorder[:index],postorder[:index])
+        right = self.buildTree(inorder[index+1:],postorder[index:len_p-1])
+        node = TreeNode(mid)
+        node.left,node.right = left,right
+        return node
         
-        right_p,right_i = [],[]
-        while(postorder[0]!=mid.val):
-            right_p.append(postorder.pop(0))
-            right_i.append(inorder.pop(0))
-        result = self.buildTree(right_i,right_p)
-        mid.right = result
-        if inorder!=[]:
-            left_new = mid
-            postorder.pop(0)
-            mid = self.buildTree(inorder,postorder)
-            root = mid
-            while(root.left):
-                root = root.left
-            root.left = left_new
+#         if len(inorder)==0:
+#             return None
+#         elif len(inorder)==1:
+#             node = inorder.pop(0)
+#             return TreeNode(node)
+                
+#         if inorder[0]==postorder[0]:
+#             postorder.pop(0)
+#             left = TreeNode(inorder.pop(0))
+#             mid = TreeNode(inorder.pop(0))
+#             mid.left = left
+#         else:
+#             mid = TreeNode(inorder.pop(0))
+#             mid.left = None 
+#         if inorder==[]: return mid
+        
+#         right_p,right_i = [],[]
+#         while(postorder[0]!=mid.val):
+#             right_p.append(postorder.pop(0))
+#             right_i.append(inorder.pop(0))
+#         result = self.buildTree(right_i,right_p)
+#         mid.right = result
+#         if inorder!=[]:
+#             left_new = mid
+#             postorder.pop(0)
+#             mid = self.buildTree(inorder,postorder)
+#             root = mid
+#             while(root.left):
+#                 root = root.left
+#             root.left = left_new
             
-        return mid
+#         return mid
