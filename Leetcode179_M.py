@@ -16,11 +16,11 @@ class Solution(object):
     
         # 字符串比较
         # if "12">"7":
-        #     print("aaa") True
+        #     print("aaa") False
         # if "202"<"290":
         #     print('bb') Ture
         # if "10"<"20":
-        #     print("cc") False
+        #     print("cc") True
         
         
         
