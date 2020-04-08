@@ -40,3 +40,11 @@ class Solution(object):
             if i!=[x,y] and result_all[i[0]][i[1]]==1 and tuple(i) not in dict_all:
                 result.append(i)
         return result
+
+    # 这个是一个快一点的方法，不需要预先准备result数组了。就是直接对每一位进行累加了。
+    # def digitsum(self,n):
+    #     ans = 0
+    #     while n:
+    #         ans += n % 10
+    #         n //= 10
+    #     return ans
