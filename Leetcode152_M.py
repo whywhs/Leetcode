@@ -54,3 +54,24 @@ class Solution(object):
                 result_all.append(judge(j))
         max_result = max(result_all)
         return 0 if 0 in nums and max_result<0 else max_result 
+
+
+# 这种解法是更合适的，使用了动态规划的解法。思路就是维护两个数组，一个数组是让大的更大，另一个是让小的更小。
+# 数组大的更大所采用的就是，当前值nums[i],前一时刻的最大值*当前值，后一时刻的最大值*当前值
+# 数组小的更小采用的道理一样。
+class Solution(object):
+    def maxProduct(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        f_pre_min,f_pre_max = 1,1
+        max_all = float('-inf')
+        for i in range(len(nums)):
+            f_max = max(nums[i],f_pre_max*nums[i],f_pre_min*nums[i])
+            f_min = min(nums[i],f_pre_max*nums[i],f_pre_min*nums[i])      
+            f_pre_max = f_max
+            f_pre_min = f_min
+            if f_max>max_all:
+                max_all = f_max
+        return max_all
