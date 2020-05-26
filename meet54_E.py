@@ -26,3 +26,27 @@ class Solution(object):
         if len(self.nums)==k:
             self.out.append(self.nums[-1])
         self.func(root.left,k)
+
+# 这种是迭代的做法。相当于先将right全部append到stack里面，然后一个一个拿出来。
+# 对于拿出来的root来说，当他有left的时候，那么同样的，将left进行迭代，仍是加入right.
+class Solution(object):
+    def kthLargest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        stack = []
+        while(root):
+            stack.append(root)
+            root = root.right
+        
+        while(stack):
+            now = stack.pop()
+            k -= 1
+            if k==0: return now.val
+            now = now.left
+            while(now):
+                stack.append(now)
+                now = now.right
+        return 
