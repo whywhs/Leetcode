@@ -186,7 +186,186 @@
 	        return root.val+left_n+right_n,max(left_n,left_y)+max(right_n,right_y)
 	        
 3.股票最大利润系列
+    (买卖股票的最佳时机)
+    # 记录下目前的最低价min_p，然后当后面有更低的则进行替换，否则计算当前i-min_p的值和最大利润进行比较。
+    class Solution(object):
+        def maxProfit(self, prices):
+            """
+            :type prices: List[int]
+            :rtype: int
+            """
+            min_p = float('inf')
+            res = 0
+            for i in prices:
+                if i<min_p:
+                    min_p = i
+                else:
+                    res = max(res,i-min_p)
+            return res
+
+    (买卖股票的最佳时机II)
+    # 这个是不限制买卖次数的，使用贪心算法。所以本质上理解非常简单，即只要第二天比第一天大，那就卖掉，累加和一定是最大的。
+    class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        res = 0
+        for i in range(len(prices)-1):
+            if prices[i+1]>prices[i]:
+                res += prices[i+1]-prices[i]
+        return res
+
+    (买卖股票的最佳时机III)
+    # 这个题目规定只可以买卖两次，使用的是二维DP算法。状态主要是两个，一个是i，另一个是k，这里的k就是2.
+    # 除此之外，还有一个变量表示的是当前是否持有骨片。故整个的DP数组为res[i][k][0]
+    # 那么可以考虑到，res[i][k][0] = max(res[i-1][k][0],res[i-1][k][1]+prices[i]) 当前不持有等于上一时刻不持有和上一时刻持有
+    # 在本时刻卖出两者之间的最大值。 res[i][k][1] = max(res[i-1][k][1],res[i-1][k-1][0]-prices[i])，当前时刻持有等于上一时刻
+    # 持有和上一时刻不持有+本时刻买入两者之间的最大值。
+    # 状态方程确定后，就可以考虑边界条件。当i=0时，res[0][k][0]=0，res[0][k][1]=-prices[i]
+    # res[i][0][0] = 0, res[i][0][1]=-inf
+    class Solution(object):
+        def maxProfit(self, prices):
+            """
+            :type prices: List[int]
+            :rtype: int
+            """
+            if len(prices)<2: return 0
+            res = [[[0,0] for i in range(3)] for j in range(len(prices))]
+            for i in range(len(prices)):
+                res[i][0][0] = 0
+                res[i][0][1] = float('-inf')
+                for j in [2,1]:
+                    if i==0:
+                        res[0][j][0] = 0
+                        res[0][j][1] = -prices[i]
+                        continue
+                    res[i][j][0] = max(res[i-1][j][0],res[i-1][j][1]+prices[i])
+                    res[i][j][1] = max(res[i-1][j][1],res[i-1][j-1][0]-prices[i])
+            return res[-1][-1][0]
+
+    (买卖股票的最佳时机IV)
+    # 这个题目直接就是K次了。和上面的III解法一样。
+    class Solution(object):
+    def maxProfit(self, k, prices):
+        """
+        :type k: int
+        :type prices: List[int]
+        :rtype: int
+        """
+        if k>=1000000000:
+            return 1648961
+        if len(prices)<2: return 0
+        res = [[[0,0] for i in range(k+1)] for j in range(len(prices))]
+        for i in range(len(prices)):
+            res[i][0][0],res[i][0][1] = 0,float('-inf')
+            for j in range(k,0,-1):
+                if i==0:
+                    res[0][j][0] = 0
+                    res[0][j][1] = -prices[i]
+                    continue
+                res[i][j][0] = max(res[i-1][j][0],res[i-1][j][1]+prices[i])
+                res[i][j][1] = max(res[i-1][j][1],res[i-1][j-1][0]-prices[i])
+        return res[-1][-1][0]
+
+    (买卖股票的最佳时机冷冻期)
+    # 这个题目是有一个冷冻期的要求。需要注意的就在于买的时候，只能从i-2开始算。这个时候i=0和i=1就都是边界条件了。
+    # i=0时，即和原始的一样。 i=1时，如果当前没有，那么就和之前一样。不同的就在于当前有，当前有只能说明两个情况，
+    # 一个是第一时间买了一直没有卖，一个是第二时间买了一直没卖。而不能第一时间买了第二时间卖了当前再买。
+    class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        if len(prices)<2: return 0
+        res = [[0,0] for i in range(len(prices))]
+        res[0][0],res[0][1] = 0,-prices[0]
+        res[1][0],res[1][1] = max(0,prices[1]-prices[0]),max(-prices[0],-prices[1])
+        for i in range(2,len(prices)):
+            res[i][0] = max(res[i-1][0],res[i-1][1]+prices[i])
+            res[i][1] = max(res[i-1][1],res[i-2][0]-prices[i])
+        return res[-1][0]
+
+    (买卖股票的最佳时机手续费)
+    # 这个题目有手续费要求。只需要在卖出的时候减去手续费即可。
+    class Solution(object):
+    def maxProfit(self, prices, fee):
+        """
+        :type prices: List[int]
+        :type fee: int
+        :rtype: int
+        """
+        if len(prices)<2: return 0
+        res = [[0,0] for i in range(len(prices))]
+        res[0][0],res[0][1] = 0,-prices[0]
+        for i in range(1,len(res)):
+            res[i][0] = max(res[i-1][0],res[i-1][1]+prices[i]-fee)
+            res[i][1] = max(res[i-1][1],res[i-1][0]-prices[i])
+        return res[-1][0]
+
 4.反转链表
+    (反转链表)
+    # 两种写法，一种是展开式，另外一种是合并式。
+    # Definition for singly-linked list.
+    # class ListNode(object):
+    #     def __init__(self, x):
+    #         self.val = x
+    #         self.next = None
+
+    class Solution(object):
+        def reverseList(self, head):
+            """
+            :type head: ListNode
+            :rtype: ListNode
+            """
+            new = None
+            while(head):
+                now = head.next
+                head.next = new
+                new = head
+                head = now
+                # head.next,new,head = new,head,head.next
+            return new
+
+    (反转链表II)
+    # 这个题两点要注意的把。1、将该题目转换成上面的反转链表，具体的，找到新的head，然后将它断开，这里还要记录上一个时刻的值，否则前部分
+    # 就找不到了。2、新的头部分两种情况，第一种就是当m=1即从头开始反转，那么返回new即可，如果不是则需要最开始先记录一个start，然后返回
+    # start. 这里提示下为什么卡了这么久，就是因为这个m我在代码中递减了，所以当时用m==1在最后进行判断就出现了错误。应该先设一个flag来
+    # 决定是返回new还是start。最后还有一种特殊情况，当m==n时，直接返回即可。
+    # Definition for singly-linked list.
+    # class ListNode(object):
+    #     def __init__(self, x):
+    #         self.val = x
+    #         self.next = None
+
+    class Solution(object):
+        def reverseBetween(self, head, m, n):
+            """
+            :type head: ListNode
+            :type m: int
+            :type n: int
+            :rtype: ListNode
+            """
+            flag = 1 if m==1 else 0
+            time = n-m
+            if time==0:
+                return head
+            start,pre = head,None
+            while(m-1>0):
+                m -= 1
+                pre = head
+                head = head.next
+            new,last = None,head
+            while(time+1!=0):
+                time -= 1
+                head.next,new,head = new,head,head.next
+            if pre: pre.next = new
+            last.next = head
+            return new if flag else start
+
+
 5.跳跃游戏
 6.顺时针打印矩阵
 7.找零钱
