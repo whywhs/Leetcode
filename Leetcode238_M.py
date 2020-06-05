@@ -1,3 +1,23 @@
+# 这个是最优解法。时间O(N)空间O(1)。具体的解法就是首先定义输出数组res，res[0]=1。然后对输出数组进行前向类乘，得到前向的乘积
+# res[i]=res[i-1]*nums[i-1]，第一项为1的目的是我们不需要整个数组的乘积。
+# 再对输出数组进行后向类乘，得到最终结果。注意后向类乘的R首先定义为1，然后res[-i-1] = res[-i-1]*R
+# 之后，再对R进行更新，R=R*nums[-i-1],得到下一个R
+class Solution(object):
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        res = [0]*len(nums)
+        res[0]=1
+        for i in range(1,len(nums)):
+            res[i] = res[i-1]*nums[i-1]
+        R = 1
+        for i in range(len(nums)):
+            res[-i-1] = res[-i-1]*R
+            R *= nums[-i-1]
+        return res
+
 #对于这个题目来说，最简单的方法肯定是全部连乘，然后再分别除以各自的数。
 #但是题目中要求不能使用除法，故下面采用的是一个移位的做法。将nums中的数分别一位一位的向前移动，并保留移动后的数组。
 #接着对数组的第一列进行连乘，即得到除自身外的连乘积。但是，该做法空间上没有办法通过测试。

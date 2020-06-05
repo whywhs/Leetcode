@@ -367,7 +367,77 @@
 
 
 5.跳跃游戏
+
+    (跳跃游戏)
+    # 这个是O(N)的解法，通过一个while循环来进行。max_now为当前所能够到达的最大的位置，i为当前的索引。
+    # 如果i比max_now小，那说明i还可以继续向前+，如果此时max_now已经是数组的长度了，那么就可以直接True
+    # 否则，循环结束，直接False。
+    class Solution(object):
+    def canJump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        if len(nums)==1:
+            return True
+        max_now,i = nums[0],0
+        while(i<=max_now):
+            if nums[i]+i>max_now:
+                max_now = nums[i]+i
+            i+=1
+            if max_now>=len(nums)-1:
+                return True
+        return False
+
+    (跳跃游戏II)
+    # 两种解法。一种是采用了两层循环，内层循环即当前nums能够到达的最大位置和当前位置之间的数进行循环，来查找下一个最大的位置。
+    # 外层循环就是记录是否已经到达了数组的结尾，当max_len>=len(nums)-1的时候，说明已经可以到达最后的位置了。
+    # 一种循环的解法就是记录end坐标以及max_len. 当当前的idx不等于end的时候，说明本轮次的统计还没有结束。当当前idx==end时，就可以
+    # 更新新的end以及对count+1。 在更新新的end之后还需要判断end是否已经到达了数组末尾，如果到了直接return count就可以了。
+    class Solution(object):
+    def jump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums)==1:
+            return 0
+        count,end,max_len = 0,0,0
+        for i in range(len(nums)):
+            max_len = max(max_len,nums[i]+i)
+            if i==end:
+                count += 1
+                end = max_len
+            if end>=len(nums)-1:
+                return count
+        return count
+
+        # start,max_len,count = 0,nums[0],0
+        # while(max_len<len(nums)-1):
+        #     for i in range(nums[start]):
+        #         idx = start+i+1
+        #         if idx+nums[idx]>max_len:
+        #             max_len = idx+nums[idx]
+        #             idx_now = idx
+        #     start = idx_now
+        #     count += 1
+        # return count+1
 6.顺时针打印矩阵
+    # 顺时针打印矩阵。这里主要是这个*的用法，*代表是一个不定长的序列，而zip函数恰恰可以接受不定长参数。
+    # *的意思类似迭代的进行输入，如果*[1,2,3]相当于对函数依次输入1,2,3，如果*[[1,2,3],[4,5,6]]相当于向函数依次输入
+    # [1,2,3],[4,5,6],然后zip([1,2,3],[4,5,6])就相当于返回了((1,4),(2,5),(3,6)),那么在进行[::-1]就得到了矩阵的转置
+    class Solution(object):
+    def spiralOrder(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: List[int]
+        """
+        print(zip(*matrix))
+        res = []
+        while(matrix):
+            res += matrix.pop(0)
+            matrix = zip(*matrix)[::-1]
+        return res
 7.找零钱
 8.不重复数字的全排列
 9.大整数加法
@@ -447,3 +517,31 @@
 
 12.链表有无环
 13.最小栈
+14.前缀树
+    # 前缀树的写法要记住。for i in s: tree = tree.setdefault(i,{})
+    # tree['end'] = True
+    # dict.setdefault(i,value)的返回值就是value，如果i存在于dict中，那么就不需要value，因为value是初始值。
+    class Solution(object):
+        def longestCommonPrefix(self, strs):
+            """
+            :type strs: List[str]
+            :rtype: str
+            """
+            if not strs: return ''
+            word,s = {},strs[0]
+            tree = word
+            for i in s:
+                tree = tree.setdefault(i,{})
+            tree['end'] = True
+
+            out = strs[0]
+            for i in strs[1:]:
+                sub,tree = '',word
+                for j in i:
+                    if j not in tree:
+                        break
+                    tree = tree[j]
+                    sub += j
+                if len(sub)<len(out):
+                    out = sub
+            return out
