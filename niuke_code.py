@@ -439,9 +439,83 @@
             matrix = zip(*matrix)[::-1]
         return res
 7.找零钱
+    # 零钱兑换。这个题目不需要二维的DP数组，直接用一维的DP数组就可以解决了。具体的做法就是，res[i] = min(res[i],res[i-j]+1)
+    # 然后，当经过for j 这个循环之后，如果还是float('inf')那就说明当前这个是没有办法直接兑换的，就返回-1
+    class Solution(object):
+        def coinChange(self, coins, amount):
+            """
+            :type coins: List[int]
+            :type amount: int
+            :rtype: int
+            """
+            res = [float('inf') for i in range(amount+1)]
+            res[0] = 0
+            for i in range(1,len(res)):
+                for j in coins:
+                    if i>=j and res[i-j]!=-1:
+                        res[i] = min(res[i],res[i-j]+1)
+                if res[i]==float('inf'):
+                    res[i] = -1
+            return res[-1]
+
+    # 零钱兑换II。这个题目是每个硬币个数无限，求一共有几种组合方式。 使用DP数组的话这里是先对coin进行遍历，再对钱数进行遍历。这样遍历
+    # 可以避免重复情况，例如1+2和2+1，因为我是先对coin进行遍历，所以每次遍历都是只采用了一种情况的硬币，就不会出现1+2和2+1，只会
+    # 有1+2这种情况。但如果是反过来进行遍历，那么就对于3就会有两种，一种是1+2，另一种是2+1，但实际上是一样的。
+    class Solution(object):
+    def change(self, amount, coins):
+        """
+        :type amount: int
+        :type coins: List[int]
+        :rtype: int
+        """
+        res = [0]*(amount+1)
+        res[0] = 1
+        for j in coins:
+            for i in range(1,len(res)):
+                if i>=j:
+                    res[i] = res[i] + res[i-j]
+        return res[-1]
+
+
 8.不重复数字的全排列
+    # 回溯算法。
+    class Solution(object):
+        def permute(self, nums):
+            """
+            :type nums: List[int]
+            :rtype: List[List[int]]
+            """
+            if len(nums)<=1:
+                return [nums]
+            res = []
+            for i in range(len(nums)):
+                now,pre = nums[i],nums[:i]+nums[i+1:]
+                result = self.permute(pre)
+                for j in result:
+                    res.append([now]+j)
+            return res
 9.大整数加法
 10.翻转二叉树
+    # Definition for a binary tree node.
+    # class TreeNode(object):
+    #     def __init__(self, x):
+    #         self.val = x
+    #         self.left = None
+    #         self.right = None
+
+    class Solution(object):
+        def invertTree(self, root):
+            """
+            :type root: TreeNode
+            :rtype: TreeNode
+            """
+            if not root:
+                return None
+            right = self.invertTree(root.right)
+            left = self.invertTree(root.left)
+            root.right = left
+            root.left = right
+            return root
 11.二叉树层次遍历
     # Definition for a binary tree node.
     # class TreeNode(object):
@@ -516,7 +590,112 @@
             return left+res
 
 12.链表有无环
+    # Definition for singly-linked list.
+    # class ListNode(object):
+    #     def __init__(self, x):
+    #         self.val = x
+    #         self.next = None
+
+    class Solution(object):
+        def hasCycle(self, head):
+            """
+            :type head: ListNode
+            :rtype: bool
+            """
+            slow,fast = head,head
+            while(slow and fast and fast.next):
+                slow = slow.next
+                fast = fast.next.next
+                if slow==fast:
+                    return True
+            return False
+    # 判断环的入口。具体做法就是在slow和fast相遇之后，从head定义一个now,然后和slow分别前进，相遇点即为入口。
+    # Definition for singly-linked list.
+    # class ListNode(object):
+    #     def __init__(self, x):
+    #         self.val = x
+    #         self.next = None
+
+    class Solution(object):
+        def detectCycle(self, head):
+            """
+            :type head: ListNode
+            :rtype: ListNode
+            """
+            slow,fast = head,head
+            while(slow and fast and fast.next):
+                slow = slow.next
+                fast = fast.next.next
+                if slow==fast:
+                    now = head
+                    while(slow!=now):
+                        now = now.next
+                        slow = slow.next
+                    return slow
+            return None
+            
+            # dict_all = {}
+            # while(head):
+            #     if head in dict_all:
+            #         return head
+            #     dict_all[head] = 1
+            #     head = head.next
+            # return None
 13.最小栈
+    # 通过两个数组来分别记录数据和最小值。
+    class MinStack(object):
+
+        def __init__(self):
+            """
+            initialize your data structure here.
+            """
+            self.list_min = []
+            self.stack = []
+
+        def push(self, x):
+            """
+            :type x: int
+            :rtype: None
+            """
+            self.stack.append(x)
+            if self.list_min: 
+                if self.list_min[-1]>x:
+                    self.list_min.append(x)
+                else:
+                    self.list_min.append(self.list_min[-1])
+            else:
+                self.list_min.append(x)
+     
+
+        def pop(self):
+            """
+            :rtype: None
+            """
+            self.list_min.pop()
+            return self.stack.pop()
+
+
+        def top(self):
+            """
+            :rtype: int
+            """
+            return self.stack[-1]
+
+
+        def getMin(self):
+            """
+            :rtype: int
+            """
+            return self.list_min[-1]
+
+
+
+    # Your MinStack object will be instantiated and called as such:
+    # obj = MinStack()
+    # obj.push(x)
+    # obj.pop()
+    # param_3 = obj.top()
+    # param_4 = obj.getMin()
 14.前缀树
     # 前缀树的写法要记住。for i in s: tree = tree.setdefault(i,{})
     # tree['end'] = True
