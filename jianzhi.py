@@ -157,3 +157,120 @@
 	        for i in range(3,n+1):
 	            a,b = b,a+b
 	        return b%int(1E+9+7)
+
+
+# 11
+    # 最小和最大的看法还是有所不同的。最小看得是右侧边界的值，最大看得是左侧边界的值。同时，由于//是向下取整，所以我们在求最小的时候
+    # 采用j-=1这个并不会影像到最小值跳过的问题。
+	class Solution(object):
+	    def minArray(self, numbers):
+	        """
+	        :type numbers: List[int]
+	        :rtype: int
+	        """
+	        if len(numbers)==1: return numbers[0]
+
+	        # i,j = 0, len(numbers)-1
+	        # while(i<j):
+	        #     mid = (i+j)//2
+	        #     if numbers[mid]>numbers[j]:
+	        #         i = mid +1
+	        #     elif numbers[mid]<numbers[j]:
+	        #         j = mid
+	        #     else:
+	        #         j -= 1
+	        # return numbers[i]
+	        i,j = 0, len(numbers)-1
+	        while(i<j):
+	            mid = (i+j)//2+1
+	            if numbers[mid]>numbers[i]:
+	                i = mid
+	            elif numbers[mid]<numbers[i]:
+	                j = mid-1
+	            else:
+	                i+= 1
+	            
+	        return numbers[i]
+
+	# 搜索旋转数组。这个题就是通过中值和j的大小来首先判断递增递减区间，然后如果t在这个区间，直接就让他进入，如果不在就在另一边
+	# 需要注意的，一个是i<=j是循环条件，如果不加=那么在i=j时就跳出了，但此时有可能nums[i]=t的。另外，i=mid+1，因为i一定不是结果
+	# 了。
+	class Solution(object):
+	    def search(self, nums, target):
+	        """
+	        :type nums: List[int]
+	        :type target: int
+	        :rtype: int
+	        """
+	        if len(nums)==1: return 0 if nums[0]==target else -1
+	        i,j = 0,len(nums)-1
+	        while(i<=j):
+	            mid = (i+j)//2
+	            if nums[mid]==target:
+	                return mid
+	            if nums[mid]>nums[j]:
+	                if nums[i]<=target<nums[mid]:
+	                    j = mid-1
+	                else:
+	                    i = mid+1
+	            else:
+	                if nums[mid]<target<=nums[j]:
+	                    i = mid+1
+	                else:
+	                    j = mid-1 
+	        return -1
+
+# 12
+	class Solution(object):
+    def exist(self, board, word):
+        """
+        :type board: List[List[str]]
+        :type word: str
+        :rtype: bool
+        """
+        if not board: return False
+        len_x,len_y = len(board),len(board[0])
+
+        def func(x,y,k):
+            if x<0 or y<0 or x>=len_x or y>=len_y or board[x][y]!=word[k]:
+                return False
+            if k==len(word)-1:
+                return True
+            tmp,board[x][y] = board[x][y],''
+            res = func(x-1,y,k+1) or func(x+1,y,k+1) or func(x,y-1,k+1) or func(x,y+1,k+1)
+            board[x][y] = tmp
+            return res
+
+        for i in range(len_x):
+            for j in range(len_y):
+                if func(i,j,0):
+                    return True
+        return False
+    
+
+# 13
+	class Solution(object):
+    def movingCount(self, m, n, k):
+        """
+        :type m: int
+        :type n: int
+        :type k: int
+        :rtype: int
+        """
+        def func(i,j):
+            ij = str(i)+str(j)
+            a = 0
+            for m in ij:
+                a += int(m)
+            return a
+
+        stack = [(0,0)]
+        res,dict_all = 0,{}
+        while(stack):
+            now_i,now_j = stack.pop()
+            if now_i<0 or now_j<0 or now_i>=m or now_j>=n or (now_i,now_j) in dict_all or func(now_i,now_j)>k:
+                continue
+            dict_all[(now_i,now_j)] = 1
+            res += 1
+            stack = [(now_i+1,now_j),(now_i-1,now_j),(now_i,now_j+1),(now_i,now_j-1)] + stack
+        return res
