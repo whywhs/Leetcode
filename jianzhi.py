@@ -274,3 +274,130 @@
             res += 1
             stack = [(now_i+1,now_j),(now_i-1,now_j),(now_i,now_j+1),(now_i,now_j-1)] + stack
         return res
+
+
+# 14
+	# 剪绳子的问题。
+	class Solution(object):
+	    def cuttingRope(self, n):
+	        """
+	        :type n: int
+	        :rtype: int
+	        """
+	        res = [1]*(n+1)
+	        for i in range(2,len(res)):
+	            for j in range(1,i):
+	                res[i] = max(res[j]*(i-j),res[i],j*(i-j))
+	        return res[-1]
+
+
+# 15 
+	class Solution(object):
+	    def hammingWeight(self, n):
+	        """
+	        :type n: int
+	        :rtype: int
+	        """
+	        res = 0
+	        while(n!=0):
+	            res += n&1
+	            n = n>>1
+	        return res
+	        # 这个用的是n&(n-1)，这个式子找的是最右边1的位置。n-1的话，最右边的1变为0，最右边的1右边的0全部变成1，故n&(n-1)即
+	        # 将最右边的1消去。那么能够执行几次即有几个1.
+		    # res = 0
+	        # while(n!=0):
+	        #     res += 1
+	        #     n = n&(n-1)
+	        # return res
+
+
+# 16
+	class Solution(object):
+	    def myPow(self, x, n):
+	        """
+	        :type x: float
+	        :type n: int
+	        :rtype: float
+	        """
+	        if n==0:
+	            return 1
+	        if n==1:
+	            return x
+	        k = n if n>0 else -n
+	        res = self.myPow(x,k//2)
+	        res = res*res
+	        if k%2!=0: res *= x
+
+	        return 1.0/res if n<0 else res
+
+
+# 18
+	# Definition for singly-linked list.
+	# class ListNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.next = None
+	class Solution(object):
+	    def deleteNode(self, head, val):
+	        """
+	        :type head: ListNode
+	        :type val: int
+	        :rtype: ListNode
+	        """
+	        if head.val == val:
+	            return head.next
+	        root = head
+	        while(root):
+	            if root.val!=val:
+	                pre = root
+	                root = root.next
+	            else:
+	                pre.next = root.next
+	                break
+	        return head
+
+
+# 19
+	class Solution(object):
+	    def exchange(self, nums):
+	        """
+	        :type nums: List[int]
+	        :rtype: List[int]
+	        """
+	        if len(nums)<2: return nums
+	        i,j = 0,len(nums)-1
+	        while(i<j):
+	            while(i<j and nums[j]%2==0):
+	                j -= 1
+	            while(i<j and nums[i]%2!=0):
+	                i += 1
+	            if i+1==j and nums[i]%2!=0 and nums[j]%2==0:
+	                break
+	            if i<j:
+	                nums[i],nums[j] = nums[j],nums[i]
+	        return nums
+
+
+#20 
+	# Definition for singly-linked list.
+	# class ListNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.next = None
+
+	class Solution(object):
+	    def getKthFromEnd(self, head, k):
+	        """
+	        :type head: ListNode
+	        :type k: int
+	        :rtype: ListNode
+	        """
+	        a,b = head,head
+	        while(k>0):
+	            a = a.next
+	            k -= 1
+	        while(a):
+	            a = a.next
+	            b = b.next
+	        return b
