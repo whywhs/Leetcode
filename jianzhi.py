@@ -402,3 +402,55 @@
 	            b = b.next
 	        return b
 
+
+# 24
+	# Definition for singly-linked list.
+	# class ListNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.next = None
+
+	class Solution(object):
+	    def reverseList(self, head):
+	        """
+	        :type head: ListNode
+	        :rtype: ListNode
+	        """
+	        new = None
+	        while(head):
+	            head.next,new,head = new,head,head.next
+	        return new
+
+
+# 25
+	# Definition for singly-linked list.
+	# class ListNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.next = None
+
+	class Solution(object):
+	    def mergeTwoLists(self, l1, l2):
+	        """
+	        :type l1: ListNode
+	        :type l2: ListNode
+	        :rtype: ListNode
+	        """
+	        if not l1 or not l2:
+	            return l1 or l2
+
+	        if l1.val>l2.val:
+	            l1,l2 = l2,l1
+	        head1,head2 = l1,l2
+	        while(head1 and head2):
+	            while(head1 and head2 and head1.val<=head2.val):
+	                pre = head1
+	                head1 = head1.next
+	            pre.next = head2
+	            while(head1 and head2 and head2.val<head1.val):
+	                pre = head2
+	                head2 = head2.next
+	            pre.next = head1
+	        if head1: pre.next = head1
+	        if head2: pre.next = head2
+	        return l1
