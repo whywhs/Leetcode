@@ -379,7 +379,7 @@
 	        return nums
 
 
-#20 
+#22 
 	# Definition for singly-linked list.
 	# class ListNode(object):
 	#     def __init__(self, x):
@@ -401,3 +401,4 @@
 	            a = a.next
 	            b = b.next
 	        return b
+
