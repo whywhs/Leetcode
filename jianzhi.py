@@ -454,3 +454,81 @@
 	        if head1: pre.next = head1
 	        if head2: pre.next = head2
 	        return l1
+
+
+
+# 26
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def isSubStructure(self, A, B):
+	        """
+	        :type A: TreeNode
+	        :type B: TreeNode
+	        :rtype: bool
+	        """
+	        # 在这个子方程中，B没有的话代表是已经正确匹配了，所以返回True
+	        def func(A,B):
+	            if not B: return True
+	            if not A or A.val!=B.val: return False
+	            return func(A.left,B.left) and func(A.right,B.right)
+
+	        # 在这个方程中，A和B都空代表初始值，所以都是FALSE
+	        if not B or not A: return False
+	        if func(A,B):
+	            return True
+	        return self.isSubStructure(A.left,B) or self.isSubStructure(A.right,B)
+
+
+# 27
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def mirrorTree(self, root):
+	        """
+	        :type root: TreeNode
+	        :rtype: TreeNode
+	        """
+	        if not root:
+	            return None
+	        left = self.mirrorTree(root.left)
+	        right = self.mirrorTree(root.right)
+	        root.left = right
+	        root.right = left
+	        return root
+
+
+# 28
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def isSymmetric(self, root):
+	        """
+	        :type root: TreeNode
+	        :rtype: bool
+	        """
+	        def func(left,right):
+	            if not left and not right:
+	                return True
+	            if not left or not right or left.val!=right.val:
+	                return False
+	            return func(left.left,right.right) and func(left.right,right.left)
+	        
+	        if not root:
+	            return True
+	        return func(root.left,root.right)
