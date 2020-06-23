@@ -42,3 +42,30 @@ class Solution(object):
         result += [max(value1,value2,value3,value4)]
         
         return result,max(value1,value2,value3)
+
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def maxPathSum(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        def func(root):
+            if not root.left and not root.right:
+                return root.val,root.val
+            left,right = float('-inf'),float('-inf')
+            left_all,right_all = float('-inf'),float('-inf')
+            if root.left:
+                left,left_all = func(root.left)
+            if root.right:
+                right,right_all = func(root.right)
+            max_return = max(left,right)
+            return max(max_return+root.val,root.val),max(left+right+root.val,left_all,right_all,max_return)
+        return max(func(root))

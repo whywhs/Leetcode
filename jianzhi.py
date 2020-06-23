@@ -357,8 +357,30 @@
 	                break
 	        return head
 
-
 # 19
+	class Solution(object):
+	    def isMatch(self, s, p):
+	        """
+	        :type s: str
+	        :type p: str
+	        :rtype: bool
+	        """
+	        dict_all = {}
+	        def func(s,p):
+	            if (s,p) in dict_all:
+	                return dict_all[(s,p)]
+	            if not s and not p: return True
+	            if not p: return False
+	            first = True if (len(s)>0 and (s[0]==p[0] or p[0]=='.')) else False
+	            if len(p)>1 and p[1]=='*':
+	                res = func(s,p[2:]) or (first and func(s[1:],p))
+	            else:
+	                res = first and func(s[1:],p[1:])
+	            dict_all[(s,p)] = res
+	            return res
+	        return func(s,p)
+	        
+# 21
 	class Solution(object):
 	    def exchange(self, nums):
 	        """
@@ -532,3 +554,213 @@
 	        if not root:
 	            return True
 	        return func(root.left,root.right)
+
+
+
+# 30
+	class MinStack(object):
+
+	    def __init__(self):
+	        """
+	        initialize your data structure here.
+	        """
+	        self.stack = []
+	        self.min_s = []
+
+	    def push(self, x):
+	        """
+	        :type x: int
+	        :rtype: None
+	        """
+	        self.stack.append(x)
+	        if self.min_s:
+	            if x>self.min_s[-1]:
+	                self.min_s.append(self.min_s[-1])
+	            else:
+	                self.min_s.append(x)
+	        else:
+	            self.min_s.append(x)
+
+	    def pop(self):
+	        """
+	        :rtype: None
+	        """
+	        self.min_s.pop()
+	        return self.stack.pop()
+
+
+	    def top(self):
+	        """
+	        :rtype: int
+	        """
+	        return self.stack[-1]
+
+
+	    def min(self):
+	        """
+	        :rtype: int
+	        """
+	        return self.min_s[-1]
+
+
+
+	# Your MinStack object will be instantiated and called as such:
+	# obj = MinStack()
+	# obj.push(x)
+	# obj.pop()
+	# param_3 = obj.top()
+	# param_4 = obj.min()
+
+
+# 31
+	class Solution(object):
+	    def validateStackSequences(self, pushed, popped):
+	        """
+	        :type pushed: List[int]
+	        :type popped: List[int]
+	        :rtype: bool
+	        """
+	        stack = []
+	        for i in pushed:
+	            stack.append(i)
+	            while(stack and popped and stack[-1]==popped[0]):
+	                popped.pop(0)
+	                stack.pop()
+	        return not stack
+
+
+# 32-I
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def levelOrder(self, root):
+	        """
+	        :type root: TreeNode
+	        :rtype: List[int]
+	        """
+	        if not root: return []
+	        stack = [root]
+	        res = []
+	        while(stack):
+	            now = stack.pop()
+	            res.append(now.val)
+	            if now.left:
+	                stack = [now.left]+stack
+	            if now.right:
+	                stack = [now.right]+stack
+	        return res
+
+# 32-II
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def levelOrder(self, root):
+	        """
+	        :type root: TreeNode
+	        :rtype: List[int]
+	        """
+	    
+	        def func(res,level,root):
+	            if not root:
+	                return 
+	            if len(res)==level:
+	                res.append([])
+	            res[level].append(root.val)
+	            func(res,level+1,root.left)
+	            func(res,level+1,root.right)
+
+	        res = []
+	        func(res,0,root)
+	        return res
+	        
+# 32-III
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def levelOrder(self, root):
+	        """
+	        :type root: TreeNode
+	        :rtype: List[List[int]]
+	        """
+	        res = []
+	        def func(level,root):
+	            if not root:
+	                return 
+	            if len(res)==level:
+	                res.append([])
+	            if level%2==0:
+	                res[level].append(root.val)
+	            else:
+	                res[level] = [root.val] + res[level]
+	            func(level+1,root.left)
+	            func(level+1,root.right)
+	        
+	        func(0,root)
+	        return res
+
+# 33
+	# 这个题目的话，相当于先把根节点pop()出来，然后再对根节点左右进行划分。当发现有一个大于根节点的时候，那么说明左边的就是左子树，右边的
+	# 就是右子树。继续进行遍历，如果发现右子树有小于根节点的就返回False
+	class Solution(object):
+	    def verifyPostorder(self, postorder):
+	        """
+	        :type postorder: List[int]
+	        :rtype: bool
+	        """
+	        if not postorder:
+	            return True
+	        root_now = postorder.pop()
+	        idx,flag = 0,0
+	        for i in range(len(postorder)):
+	            if flag==0 and postorder[i]>root_now:
+	                idx = i
+	                flag = 1
+	            if flag==1 and postorder[i]<root_now:
+	                return False
+	        left = self.verifyPostorder(postorder[:idx])
+	        right = self.verifyPostorder(postorder[idx:])
+	        if left and right:
+	            return True
+	        return False
+
+# 34
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Solution(object):
+	    def pathSum(self, root, sum):
+	        """
+	        :type root: TreeNode
+	        :type sum: int
+	        :rtype: List[List[int]]
+	        """
+	        if not root: return []
+	        if not root.left and not root.right:
+	            return [[root.val]] if root.val==sum else []
+	        sum_now = sum-root.val
+	        res_l,res_r = [],[]
+	        if root.left:
+	            res_l = self.pathSum(root.left,sum_now)
+	        if root.right:
+	            res_r = self.pathSum(root.right,sum_now)
+	        res = res_l+res_r
+	        return [[root.val]+i for i in res]
