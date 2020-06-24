@@ -764,3 +764,227 @@
 	            res_r = self.pathSum(root.right,sum_now)
 	        res = res_l+res_r
 	        return [[root.val]+i for i in res]
+
+# 35
+	"""
+	# Definition for a Node.
+	class Node:
+	    def __init__(self, x, next=None, random=None):
+	        self.val = int(x)
+	        self.next = next
+	        self.random = random
+	"""
+	class Solution(object):
+	    def copyRandomList(self, head):
+	        """
+	        :type head: Node
+	        :rtype: Node
+	        """
+	        def func(root):
+	            if not root:
+	                return None
+	            if root in dict_all:
+	                return dict_all[root]
+	            new = Node(root.val)
+	            dict_all[root] = new
+	            new.next = func(root.next)
+	            new.random = func(root.random)
+	            return new
+	        dict_all = {}
+	        return func(head)
+
+
+# 37
+	# 序列化与反序列化。既可以用二叉树的前序遍历，也可以用二叉树的层序遍历。两种方法的解码方式不同。
+	# 层序遍历的解码类似于队列的方法。
+	# Definition for a binary tree node.
+	# class TreeNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.left = None
+	#         self.right = None
+
+	class Codec:
+
+	    def serialize(self, root):
+	        """Encodes a tree to a single string.
+	        
+	        :type root: TreeNode
+	        :rtype: str
+	        """
+	        if not root:
+	            return ''
+	        res,stack = [],[root]
+	        while(stack):
+	            now = stack.pop()
+	            if not now:
+	                res.append('None')
+	                continue
+	            res.append(str(now.val))
+	            stack = [now.right,now.left]+stack
+	        return ','.join(res)
+	            
+	    def deserialize(self, data):
+	        """Decodes your encoded data to tree.
+	        
+	        :type data: str
+	        :rtype: TreeNode
+	        """
+	        if not data:
+	            return None
+	        list_data = data.split(',')
+	        root = TreeNode(list_data.pop(0))
+	        list_my = [root]
+	        while(list_my):
+	            now = list_my.pop(0)
+	            if not now: continue
+	            left = list_data.pop(0)
+	            right = list_data.pop(0)
+	            now.left = TreeNode(left) if left!='None' else None
+	            now.right = TreeNode(right) if right!='None' else None
+	            list_my.append(now.left)
+	            list_my.append(now.right)
+	        return root
+
+
+
+	    #     list_data = data.split(',')
+	    #     return self.func(list_data)
+
+	    # def func(self,list_data):
+	    #     now = list_data.pop(0)
+	    #     if now=='None':
+	    #         return None
+	    #     root = TreeNode(now)
+	    #     root.left = self.func(list_data)
+	    #     root.right = self.func(list_data)
+	    #     return root
+	        
+
+	# Your Codec object will be instantiated and called as such:
+	# codec = Codec()
+	# codec.deserialize(codec.serialize(root))
+
+
+# 38
+	class Solution(object):
+	    def permutation(self, s):
+	        """
+	        :type s: str
+	        :rtype: List[str]
+	        """
+	        if len(s)==1:
+	            return [s]
+	        res = set()
+	        for i in range(len(s)):
+	            sub = self.permutation(s[:i]+s[i+1:])
+	            for j in sub:
+	                res.add(s[i]+j)
+	        return list(res)
+
+# 39
+	# 摩尔投票发
+	class Solution(object):
+	    def majorityElement(self, nums):
+	        """
+	        :type nums: List[int]
+	        :rtype: int
+	        """
+	        res,count = 0,0
+	        for i in nums:
+	            if count == 0:
+	                res = i
+	                count += 1
+	            else:
+	                if i==res:
+	                    count += 1
+	                else:
+	                    count -=1
+	        return res
+
+
+# 40
+	class Solution(object):
+	    def getLeastNumbers(self, arr, k):
+	        """
+	        :type arr: List[int]
+	        :type k: int
+	        :rtype: List[int]
+	        """
+	        self.quicksort(arr,0,len(arr)-1,k)
+	        return sorted(arr[:k])
+
+	    def quicksort(self,nums,i,j,k):
+	        if i<j:
+	            base = nums[i]
+	            start,end = i,j
+	            while(start<end):
+	                while(start<end and nums[end]>base):
+	                    end -= 1
+	                nums[start] = nums[end]
+	                while(start<end and nums[start]<=base):
+	                    start += 1
+	                nums[end]= nums[start]
+	            nums[start] = base
+	            left = start-i+1
+	            if left<k:
+	                self.quicksort(nums,start+1,j,k-left)
+	            elif left>k:
+	                self.quicksort(nums,i,start-1,k)
+
+# 41
+	# 数据流中的中位数。用大小顶推的做法。其中大顶堆维护的是数组的左半部分，小顶堆维护的是数组的右半部分。那么当两者长度相同，
+	# 则取大小顶堆的头结点来平均，如果不相同则取小顶堆头部节点。注意，大顶堆是要变负号的。
+	class MedianFinder(object):
+
+	    def __init__(self):
+	        """
+	        initialize your data structure here.
+	        """
+	        self.hmax = []
+	        self.hmin = []
+
+	    def addNum(self, num):
+	        """
+	        :type num: int
+	        :rtype: None
+	        """
+	        if len(self.hmax)==len(self.hmin):
+	            heapq.heappush(self.hmax,-num)
+	            h_max = heapq.heappop(self.hmax)
+	            heapq.heappush(self.hmin,-h_max)
+	        else:
+	            heapq.heappush(self.hmin,num)
+	            h_min = heapq.heappop(self.hmin)
+	            heapq.heappush(self.hmax,-h_min)
+
+
+	    def findMedian(self):
+	        """
+	        :rtype: float
+	        """
+	        if len(self.hmax)==len(self.hmin):
+	            return (-self.hmax[0]+self.hmin[0])/2.0
+	        else:
+	            return self.hmin[0]
+
+
+
+	# Your MedianFinder object will be instantiated and called as such:
+	# obj = MedianFinder()
+	# obj.addNum(num)
+	# param_2 = obj.findMedian()
+
+
+# 42
+	class Solution(object):
+	    def maxSubArray(self, nums):
+	        """
+	        :type nums: List[int]
+	        :rtype: int
+	        """
+	        res = [0]*len(nums)
+	        res[0] = nums[0]
+	        for i in range(1,len(nums)):
+	            res[i] = nums[i] if res[i-1]<=0 else res[i-1]+nums[i]
+	        return max(res)
