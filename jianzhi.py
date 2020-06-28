@@ -988,3 +988,117 @@
 	        for i in range(1,len(nums)):
 	            res[i] = nums[i] if res[i-1]<=0 else res[i-1]+nums[i]
 	        return max(res)
+
+# 43
+    # 统计位1的个数。三个方程，当前位为0，那么height*digit, 当前位为1，那么height*digit+low+1, 当前位为其他，那么(height+1)*digit
+	class Solution(object):
+	    def countDigitOne(self, n):
+	        """      
+	        :type n: int
+	        :rtype: int
+	        """
+	        sn = str(n)[::-1]
+	        res = 0
+	        for i in range(len(sn)):
+	            digit = 10**i
+	            height,low = sn[i+1:][::-1],sn[:i][::-1]
+	            if not height: height = 0
+	            if not low: low = 0
+	            if sn[i]=='0':
+	                res += int(height)*digit
+	            elif sn[i]=='1':
+	                res += int(height)*digit+int(low)+1
+	            else:
+	                res += (int(height)+1)*digit
+	        return res 
+
+# 44
+	class Solution(object):
+	    def findNthDigit(self, n):
+	        """
+	        :type n: int
+	        :rtype: int
+	        """
+	        if n<10:
+	            return n
+	        n = n-9
+	        k = 1
+	        while(n>9*(10**k)*(k+1)):
+	            n = n - 9*(10**k)*(k+1)
+	            k += 1
+	        idx1 = n/(k+1)
+	        idx2 = n%(k+1)
+	        num = 10**k+idx1
+	        if idx2==0:
+	            return int(str(num-1)[-1])
+	        return int(str(num)[idx2-1])
+
+
+# 45
+	# 可以组成的最小数字，通过nums[i]+nums[j]和nums[j]+nums[i]比较大小来判断谁在谁前面进行排序即可。
+	class Solution(object):
+	    def minNumber(self, nums):
+	        """
+	        :type nums: List[int]
+	        :rtype: str
+	        """
+	        nums = map(str,nums)
+	        self.quicksort(nums,0,len(nums)-1)
+	        return ''.join(nums)
+	    
+	    def quicksort(self,nums,start,end):
+	        if start<end:
+	            i,j = start,end
+	            base = nums[i]
+	            while(i<j):
+	                while(i<j and int(nums[j]+base)>int(base+nums[j])):
+	                    j -= 1
+	                nums[i] = nums[j]
+	                while(i<j and int(nums[i]+base)<=int(base+nums[i])):
+	                    i += 1
+	                nums[j] = nums[i]
+	            nums[i] = base
+	            self.quicksort(nums,start,i-1)
+	            self.quicksort(nums,j+1,end)
+
+# 46
+	class Solution(object):
+	    def translateNum(self, num):
+	        """
+	        :type num: int
+	        :rtype: int
+	        """
+	        num = str(num)
+	        res = [0]*len(num)
+	        res[0] = 1
+	        for i in range(1,len(num)):
+	            if int(num[i-1]+num[i])<26 and num[i-1]!='0':
+	                if i==1: 
+	                    res[i] = res[i-1]+1
+	                else:
+	                    res[i] = res[i-1]+res[i-2]
+	            else:
+	                res[i] = res[i-1]
+	        return res[-1]
+
+
+# 47
+	class Solution(object):
+	    def maxValue(self, grid):
+	        """
+	        :type grid: List[List[int]]
+	        :rtype: int
+	        """
+	        len_x,len_y = len(grid),len(grid[0])
+	        res = [[0 for i in range(len_y)] for j in range(len_x)]
+	        res[0][0] = grid[0][0]
+	        for i in range(len_x):
+	            for j in range(len_y):
+	                if i==0 and j==0: continue
+	                if i==0:
+	                    res[i][j] = res[i][j-1]+grid[i][j]
+	                elif j==0:
+	                    res[i][j] = res[i-1][j]+grid[i][j]
+	                else:
+	                    res[i][j] = max(res[i][j-1],res[i-1][j])+grid[i][j]
+	        return res[-1][-1]
