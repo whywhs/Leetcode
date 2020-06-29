@@ -1102,3 +1102,27 @@
 	                else:
 	                    res[i][j] = max(res[i][j-1],res[i-1][j])+grid[i][j]
 	        return res[-1][-1]
+
+
+# 48
+	class Solution(object):
+	    def nthUglyNumber(self, n):
+	        """
+	        :type n: int
+	        :rtype: int
+	        """
+	        i,j,k = 0,0,0
+	        res = [1]
+	        dict_res = {}
+	        while(len(res)<n):
+	            now = min(res[i]*2,res[j]*3,res[k]*5)
+	            if now == res[i]*2:
+	                i += 1
+	            elif now == res[j]*3:
+	                j += 1
+	            else:
+	                k += 1
+	            if now not in dict_res:
+	                res.append(now)
+	                dict_res[now] = 1
+	        return res[-1]
