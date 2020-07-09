@@ -1126,3 +1126,75 @@
 	                res.append(now)
 	                dict_res[now] = 1
 	        return res[-1]
+
+
+# 49
+	class Solution:
+	    def firstUniqChar(self, s: str) -> str:
+	        dict_my = {}
+	        for i in s:
+	            dict_my[i] = True if i not in dict_my else False
+	        for i in dict_my:
+	            if dict_my[i]: return i
+	        return " "
+
+# 50 
+	# 逆序对。采用归并排序的方法来进行。记住的一点是，当前时刻的逆序对是在每一步left比right大了之后，对res加上所有的left中从当前i到len(left)
+	# 长度的个数。
+	class Solution(object):
+	    def reversePairs(self, nums):
+	        """
+	        :type nums: List[int]
+	        :rtype: int
+	        """
+	        out,res = self.func(nums)
+	        return res
+
+	    def func(self,nums):
+	        if len(nums)<=1:
+	            return nums,0
+	        mid = len(nums)//2
+	        left,res_l = self.func(nums[:mid])
+	        right,res_r = self.func(nums[mid:])
+	        i,j = 0,0
+	        res,out = 0,[]
+	        while(i<len(left) and j<len(right)):
+	            while(i<len(left) and j<len(right) and left[i]<=right[j]):
+	                out.append(left[i])
+	                i += 1
+	            while(i<len(left) and j<len(right) and left[i]>right[j]):
+	                out.append(right[j])
+	                j += 1
+	                res += len(left)-i
+	        out += left[i:]
+	        out += right[j:]
+	        return out,res_l+res_r+res
+
+# 51
+	# Definition for singly-linked list.
+	# class ListNode(object):
+	#     def __init__(self, x):
+	#         self.val = x
+	#         self.next = None
+
+	class Solution(object):
+	    def getIntersectionNode(self, headA, headB):
+	        """
+	        :type head1, head1: ListNode
+	        :rtype: ListNode
+	        """
+	        starta,startb = headA,headB
+	        while(starta!=startb):
+	            if not starta:
+	                starta = headB
+	            else:
+	                starta = starta.next
+	            if not startb:
+	                startb = headA
+	            else:
+	                startb = startb.next
+	        return starta
+
+
+
+	        
