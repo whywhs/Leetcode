@@ -326,3 +326,203 @@ class Solution(object):
         if not digits:
             return []
         return func(digits)
+
+14.删除链表的倒数第N个节点
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        """
+        :type head: ListNode
+        :type n: int
+        :rtype: ListNode
+        """
+        slow,fast = head,head
+        while(n>0):
+            fast = fast.next
+            n -= 1
+        if not fast:
+            return head.next
+        while(fast):
+            fast = fast.next
+            if not fast:
+                slow.next = slow.next.next
+                break
+            slow = slow.next
+        return head
+
+15. 有效的括号
+class Solution(object):
+    def isValid(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+
+        if not s:
+            return True
+        dict_all = {')':'(',']':'[','}':'{'}
+        stack = []
+        for i in s:
+            if i in '([{':
+                stack.append(i)
+            else:
+                if stack and stack[-1]==dict_all[i]:
+                    stack.pop()
+                else:
+                    return False
+        return True if not stack else False
+
+
+16.合并两个有序链表
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def mergeTwoLists(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        if not l1 or not l2:
+            return l1 or l2
+        if l1.val>l2.val:
+            l1,l2 = l2,l1
+        head1 = l1
+        while(l1 and l2):
+            while(l1 and l2 and l1.val<=l2.val):
+                pre = l1
+                l1 = l1.next
+            pre.next = l2
+            while(l1 and l2 and l1.val>l2.val):
+                pre = l2
+                l2 = l2.next
+            if l1: pre.next = l1
+        return head1
+
+
+17.括号生成
+class Solution(object):
+    def generateParenthesis(self, n):
+        """
+        :type n: int
+        :rtype: List[str]
+        """
+        dict_all = {}
+
+        def func(n):
+            if n==1:
+                return ['()']
+            res = func(n-1)
+            res_now = []
+            for i in res:
+                for j in range(len(i)):
+                    now = i[:j]+'()'+i[j:]
+                    if now not in dict_all:
+                        res_now.append(now)
+                        dict_all[now] = 1
+            return res_now
+
+        return func(n)
+
+18.删除排序数组中的重复项
+class Solution(object):
+    def removeDuplicates(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        s = {}
+        res,k = 0,0
+        for i in nums:
+            if i in s:
+                continue
+            else:
+                s[i] = 1
+                res += 1
+                nums[k] = i
+                k += 1
+        return res
+
+19.两数相除
+# 如果要扩大两倍，直接将该数左移一维即可，左移是后面补0。右移的话就是直接移除，最后为0。
+class Solution(object):
+    def divide(self, dividend, divisor):
+        """
+        :type dividend: int
+        :type divisor: int
+        :rtype: int
+        """
+        flag = -1 if (dividend<0)^(divisor<0) else 1
+        dividend,divisor = abs(dividend),abs(divisor)
+
+        res = 0
+        while(divisor<=dividend):
+            temp,i = divisor,1
+            while(temp<=dividend):
+                dividend -= temp
+                res += i
+                i <<= 1
+                temp <<= 1
+        if flag == -1: res = -res
+        return min(max(res,-2**31),2**31-1)
+
+
+20.搜索旋转排序数组
+class Solution(object):
+    def search(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        i,j = 0,len(nums)-1
+        while(i<=j):
+            mid = (i+j)//2
+            if nums[mid] == target:
+                return mid 
+            if nums[mid]>nums[j]:
+                if nums[i]<=target<nums[mid]:
+                    j = mid-1
+                else:
+                    i = mid+1
+            else:
+                if nums[mid]<target<=nums[j]:
+                    i = mid+1
+                else:
+                    j = mid-1
+        return -1
+
+21.在排序数组中查找元素的第一个和最后一个位置
+class Solution(object):
+    def searchRange(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        i,j = 0,len(nums)-1
+        while(i<=j):
+            mid = (i+j)//2
+            if nums[mid]>target:
+                j = mid-1
+            elif nums[mid]<target:
+                i = mid+1
+            else:
+                if nums[i]==nums[j]==target:
+                    return [i,j]
+                elif nums[i]==target:
+                    j -= 1
+                elif nums[j]==target:
+                    i += 1
+                else:
+                    i += 1
+                    j -= 1
+        return [-1,-1]
