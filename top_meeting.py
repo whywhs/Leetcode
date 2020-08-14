@@ -526,3 +526,334 @@ class Solution(object):
                     i += 1
                     j -= 1
         return [-1,-1]
+
+22. 有效的数独
+class Solution(object):
+    def isValidSudoku(self, board):
+        """
+        :type board: List[List[str]]
+        :rtype: bool
+        """
+        axis = {i:[] for i in range(9)}
+        sub = [[],[],[]]
+        for i in range(9):
+            k = 0
+            axis_i = {}
+            for j in range(9):
+                now = board[i][j]
+                if now!='.':
+                    if now in axis[j] or now in axis_i or now in sub[k]:
+                        return False
+                    axis_i[now] = 1
+                    axis[j].append(now)
+                    sub[k].append(now)
+                if (j+1)%3==0:
+                    k += 1
+            if (i+1)%3==0:
+                sub = [[],[],[]]
+        return True
+
+23. 外观数列
+class Solution(object):
+    def countAndSay(self, n):
+        """
+        :type n: int
+        :rtype: str
+        """
+        if n==1:
+            return '1'
+        res = self.countAndSay(n-1)
+        res_now = ''
+        count,now = 1,res[0]
+        for i in res[1:]:
+            if i==now:
+                count += 1
+            else:
+                res_now += str(count)+now
+                now = i
+                count = 1
+        res_now += str(count)+now
+        return res_now
+        
+
+24.缺失的第一个正数
+# 这个题两个大坑，一个是不能够用python的a,b = b,a来进行交换，因为我需要交换的的索引套索引，这个索引在为交换的时候，还是原始值
+# 另外一个就是循环条件的判断，nums[i]!=nums[nums[i]-1]和i!=nums[i]-1不一样的，前一种比后面的多了数值相等这种情况，即索引不同，但是
+# 数值相同。
+class Solution(object):
+    def firstMissingPositive(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        i = 0
+        while(i<len(nums)):
+            while(1<=nums[i]<=len(nums) and nums[i]!=nums[nums[i]-1]):
+                temp = nums[i]
+                nums[i] = nums[temp-1]
+                nums[temp-1] = temp
+            i += 1
+
+        for i in range(len(nums)):
+            if nums[i] != i+1:
+                return i+1
+        return len(nums)+1
+
+25.
+26.
+27. 全排列
+	class Solution(object):
+	    def permute(self, nums):
+	        """
+	        :type nums: List[int]
+	        :rtype: List[List[int]]
+	        """
+	        if len(nums)==1:
+	            return [nums]
+	        res_now = []
+	        for i in range(len(nums)):
+	            res = self.permute(nums[:i]+nums[i+1:])
+	            for j in res:
+	                res_now.append(j+[nums[i]])
+	        return res_now
+
+28. 旋转图像
+class Solution(object):
+    def rotate(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: None Do not return anything, modify matrix in-place instead.
+        """
+        if not matrix:
+            return 
+        dict_all = {}
+        n = len(matrix)
+        for i in range(n):
+            for j in range(n):
+                if (i,j) and (j,i) not in dict_all:
+                    matrix[i][j],matrix[j][i] = matrix[j][i],matrix[i][j]
+                    dict_all[(i,j)] = 1
+                    dict_all[(j,i)] = 1
+        
+        for i in range(n):
+            for j in range(n//2):
+                matrix[i][j],matrix[i][n-j-1] = matrix[i][n-j-1],matrix[i][j]
+
+29.字母异位词分组
+# 这个说了是小写字母的，所以就可以直接用一个26个英文字母的数组来作为idx即可。
+class Solution(object):
+    def groupAnagrams(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: List[List[str]]
+        """
+        word = {}
+        for i in strs:
+            s = [0 for _ in range(26)]
+            for j in i:
+                s[ord(j)-ord('a')] += 1
+            idx = ''.join(map(str,s))
+            if idx in word:
+                word[idx].append(i)
+            else:
+                word[idx] = [i]
+        
+        return [word[i] for i in word]
+
+30. Pow(x, n)
+class Solution(object):
+    def myPow(self, x, n):
+        """
+        :type x: float
+        :type n: int
+        :rtype: float
+        """
+        if n==0:
+            return 1
+        flag = 0
+        if n<0:
+            flag = 1
+            n = -n
+        res = self.myPow(x,n//2)
+        res *= res
+        if n%2 != 0:
+            res *= x
+        return 1.0/res if flag==1 else res
+
+31. 最大子序和
+class Solution(object):
+    def maxSubArray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        for i in range(1,len(nums)):
+            if nums[i-1]>0:
+                nums[i] += nums[i-1]
+        return max(nums)
+
+32. 螺旋矩阵
+class Solution(object):
+    def spiralOrder(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: List[int]
+        """
+        res = []
+        while(matrix):
+            res += matrix.pop(0)
+            matrix = zip(*matrix)[::-1]
+        return res
+
+
+33. 跳跃游戏
+class Solution(object):
+    def canJump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        j,max_now = 0,0
+        while(j<=max_now and max_now<len(nums)-1):
+            if nums[j]+j>max_now:
+                max_now = nums[j]+j
+            j += 1
+        if max_now>=len(nums)-1:
+            return True
+        return False
+
+
+34. 合并区间
+class Solution(object):
+    def merge(self, intervals):
+        """
+        :type intervals: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        if not intervals:
+            return []
+        intervals.sort(key=lambda x:x[0])
+        stack = [intervals[0]]
+        i = 1
+        while(i<len(intervals)):
+            now = intervals[i]
+            if stack[-1][0]<=now[0]<=stack[-1][1]:
+                stack[-1][1] = max(stack[-1][1],now[1])
+            else:
+                stack.append(now)
+            i += 1
+        return stack
+
+35. 不同路径
+class Solution(object):
+    def uniquePaths(self, m, n):
+        """
+        :type m: int
+        :type n: int
+        :rtype: int
+        """
+
+        res = [[0 for i in range(m)] for j in range(n)]
+        for i in range(n):
+            for j in range(m):
+                if i==0 and j==0:
+                    res[i][j] = 1
+                    continue
+                if i==0:
+                    res[i][j] = res[i][j-1]
+                elif j==0:
+                    res[i][j] = res[i-1][j]
+                else:
+                    res[i][j] = res[i-1][j]+res[i][j-1]
+        return res[-1][-1]
+
+36.加一
+class Solution(object):
+    def plusOne(self, digits):
+        """
+        :type digits: List[int]
+        :rtype: List[int]
+        """
+        flag = 0
+        for i in range(len(digits)-1,-1,-1):
+            if i==len(digits)-1:
+                digits[i] += 1
+            digits[i] += flag
+            flag = 0
+            if digits[i]>=10:
+                digits[i] -= 10
+                flag = 1 
+        if flag==1:
+            digits = [1]+digits
+        return digits
+
+37. x 的平方根
+class Solution(object):
+    def mySqrt(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        # i,j,res = 0,x,-1
+        # while(i<=j):
+        #     mid = (i+j)//2
+        #     if mid**2>x:
+        #         j = mid-1
+        #     elif mid**2<=x:
+        #         res = mid
+        #         i = mid+1
+        # return res
+        if x==0: return 0
+        m,x_now = float(x),float(x)
+        while(True):
+            x_next = 0.5*(x_now+m/x_now)
+            if x_now-x_next<1e-7:
+                return int(x_now)
+            x_now = x_next
+
+38. 爬楼梯
+class Solution(object):
+    def __init__(self):
+        self.dict_all = {}
+    def climbStairs(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n==1:
+            return 1
+        if n==2:
+            return 2
+        if n not in self.dict_all:
+            self.dict_all[n] = self.climbStairs(n-1)+self.climbStairs(n-2)
+        return self.dict_all[n]
+
+
+
+39. 矩阵置零
+# 这个算法一定要记住，是从右下往左上。
+class Solution(object):
+    def setZeroes(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: None Do not return anything, modify matrix in-place instead.
+        """
+        first = False
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                if i==0:
+                    if matrix[i][j]==0:
+                       first = True
+                else:
+                    if matrix[i][j] == 0:
+                        matrix[i][0] = 0
+                        matrix[0][j] = 0
+        
+        for i in range(len(matrix)-1,0,-1):
+            for j in range(len(matrix[0])-1,-1,-1):
+                if matrix[i][0] == 0 or matrix[0][j] == 0:
+                    matrix[i][j] = 0
+        
+        if first:
+            for i in range(len(matrix[0])):
+                matrix[0][i] = 0
