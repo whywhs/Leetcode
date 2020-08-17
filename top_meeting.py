@@ -56,8 +56,35 @@ class Solution(object):
             res.next,res,new = new,res.next,res
         return new
 
-3.
+3. 寻找两个正序数组的中位数
+class Solution(object):
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        if len(nums1)>len(nums2):
+            nums1,nums2 = nums2,nums1
+        n1,n2 = len(nums1),len(nums2)
+        if not n1:
+            return nums2[n2//2] if n2%2!=0 else (nums2[n2//2]+nums2[n2//2-1])/2.0
+        i,j = 0,n1
+        while(i<=j):
+            left = (i+j)//2
+            right = (n1+n2+1)//2-left
+            a1 = float('-inf') if left==0 else nums1[left-1]
+            a2 = float('inf') if left==n1 else nums1[left]
+            a3 = float('-inf') if right==0 else nums2[right-1]
+            a4 = float('inf') if right==n2 else nums2[right]
 
+            if max(a1,a3)<=min(a2,a4):
+                break
+            if a1>a4:
+                j = left-1
+            if a2<a3:
+                i = left+1
+        return max(a1,a3) if (n1+n2)%2==1 else (max(a1,a3)+min(a2,a4))/2.0
 
 
 4.无重复字符的最长子串
@@ -857,3 +884,28 @@ class Solution(object):
         if first:
             for i in range(len(matrix[0])):
                 matrix[0][i] = 0
+
+
+40. 颜色分类
+# 这个题目最简单的方法思路还是很巧妙地。定义三个指针，分别是i,j,k。其中i代表i左侧的所有数都是0，k代表k右侧的数都是2.j是一个移动位。
+# 解决的方法就是，j在数组上滑动，如果j是2，那么j就可以和k进行交换，就可以保证k一定是2，也就可以k-1.
+# 如果j是1，那么就直接将j+1即可。
+# 如果j是0, 那么就需要将j和i进行交换，则i+1即可。同时，j也要加1，j+1这里很关键，因为如果j和i进行交换，那么i缓过来的数一定是j已经扫描过得
+# 数。同时，还可以避免j和i之间，j《i的现象出现。如果出现这种现象，那么j将一直为0，整个序列也就错误了。
+class Solution(object):
+    def sortColors(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        i,j,k = 0,0,len(nums)-1
+        while(j<=k):
+            while(j<=k and nums[j]==2):
+                nums[j],nums[k] = nums[k],nums[j]
+                k -= 1
+            while(j<=k and nums[j]==0):
+                nums[i],nums[j] = nums[j],nums[i]
+                i += 1
+                j += 1
+            while(j<=k and nums[j]==1):
+                j += 1
