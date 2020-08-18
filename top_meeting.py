@@ -955,3 +955,146 @@ class Solution(object):
                 if board[i][j]==word[0] and func(i,j,0):
                     return True
         return False
+
+44.
+
+45. 合并两个有序数组。 这个是在nums1中空出了足够的空间来填入nums2
+class Solution(object):
+    def merge(self, nums1, m, nums2, n):
+        """
+        :type nums1: List[int]
+        :type m: int
+        :type nums2: List[int]
+        :type n: int
+        :rtype: None Do not return anything, modify nums1 in-place instead.
+        """
+        if n==0: return 
+        if m==0:
+            nums1[:n] = nums2[:n]
+            return 
+        i,j = m-1,n-1
+        k = (m+n)-1
+        while(i>=0 and j>=0):
+            while(i>=0 and nums1[i]>nums2[j]):
+                nums1[k] = nums1[i]
+                k -= 1
+                i -= 1
+            if i==-1:
+                nums1[:k+1] = nums2[:j+1]
+                break
+            while(j>=0 and nums1[i]<=nums2[j]):
+                nums1[k] = nums2[j]
+                k -= 1
+                j -= 1
+
+46. 解码方法
+class Solution(object):
+    def numDecodings(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        if not s or s[0]=='0':
+            return 0
+        res = [0]*len(s)
+        res[0] = 1
+        for i in range(1,len(s)):
+            if 1<=int(s[i-1]+s[i])<=26:
+                if s[i]=='0':
+                    res[i] = res[i-2] if i!=1 else 1
+                elif s[i-1]=='0':
+                    res[i] = res[i-1]
+                else:
+                    res[i] = res[i-2]+res[i-1] if i!=1 else res[i-1]+1
+            else:
+                if s[i]=='0' and (int(s[i-1]+s[i])==0 or int(s[i-1]+s[i])>26):
+                    return 0
+                res[i] = res[i-1]
+        return res[-1]
+
+
+47. 二叉树中序遍历（迭代）
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def inorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        stack,res = [],[]
+        while(root):
+            stack.append(root)
+            root = root.left
+        while(stack):
+            now = stack.pop()
+            res.append(now.val)
+            if now.right:
+                now = now.right
+                while(now):
+                    stack.append(now)
+                    now = now.left
+        return res
+
+
+48. 验证二叉搜索树
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def isValidBST(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        stack = []
+        while(root):
+            stack.append(root)
+            root = root.left
+        while(stack):
+            now = stack.pop()
+            val = now.val
+            if now.right:
+                now = now.right
+                while(now):
+                    stack.append(now)
+                    now = now.left
+            if stack and val>=stack[-1].val:
+                return False
+        return True
+
+49. 对称二叉树
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def isSymmetric(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        if not root:
+            return True
+        return self.judge(root.left,root.right)
+    
+    def judge(self,left,right):
+        if not left and not right:
+            return True
+        if not left or not right:
+            return False
+        if left.val==right.val:
+            return self.judge(left.left,right.right) and self.judge(left.right,right.left)
+        return False
