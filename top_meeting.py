@@ -909,3 +909,49 @@ class Solution(object):
                 j += 1
             while(j<=k and nums[j]==1):
                 j += 1
+
+41.
+
+42.子集
+class Solution(object):
+    def subsets(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        res = self.func(nums)
+        return res+[[]]
+    
+    def func(self,nums):
+        if len(nums)==1:
+            return [nums]
+        res = self.func(nums[1:])
+        res_now = []
+        for i in res:
+            res_now.append([nums[0]]+i)
+        return res+res_now+[[nums[0]]]
+
+43. 单词搜索
+class Solution(object):
+    def exist(self, board, word):
+        """
+        :type board: List[List[str]]
+        :type word: str
+        :rtype: bool
+        """
+        def func(x,y,k):
+            if x>=0 and y>=0 and x<len(board) and y<len(board[0]) and board[x][y]==word[k]:
+                if k==len(word)-1:
+                    return True
+                temp = board[x][y]
+                board[x][y] = '-1'
+                if func(x-1,y,k+1) or func(x+1,y,k+1) or func(x,y-1,k+1) or func(x,y+1,k+1):
+                    return True
+                board[x][y] = temp
+            return False
+
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j]==word[0] and func(i,j,0):
+                    return True
+        return False
