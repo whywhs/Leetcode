@@ -1098,3 +1098,344 @@ class Solution(object):
         if left.val==right.val:
             return self.judge(left.left,right.right) and self.judge(left.right,right.left)
         return False
+
+50. 二叉树层序遍历
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def levelOrder(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        res = []
+        self.func(root,res,0)
+        return res
+        
+    def func(self,root,res,k):
+        if not root:
+            return
+        if k==len(res):
+            res.append([])
+        res[k].append(root.val)
+        self.func(root.left,res,k+1)
+        self.func(root.right,res,k+1)
+
+51. 二叉树深度
+
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        if not root:
+            return 0
+        stack = [root]
+        high,sub = 1,[]
+        while(stack):
+            now = stack.pop()
+            if now.left:
+                sub.append(now.left)
+            if now.right:
+                sub.append(now.right)
+            if not stack:
+                if sub: high += 1
+                stack = sub
+                sub = []
+        return high
+
+52. 从前序与中序遍历序列构造二叉树
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def buildTree(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: TreeNode
+        """
+        if not preorder:
+            return None
+        now = preorder.pop(0)
+        root = TreeNode(now)
+        idx = inorder.index(now)
+        root.left = self.buildTree(preorder[:idx],inorder[:idx])
+        root.right = self.buildTree(preorder[idx:],inorder[idx+1:])
+        return root
+
+53. 填充每个节点的下一个右侧节点指针
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val=0, left=None, right=None, next=None):
+        self.val = val
+        self.left = left
+        self.right = right
+        self.next = next
+"""
+
+class Solution(object):
+    def connect(self, root):
+        """
+        :type root: Node
+        :rtype: Node
+        """
+        if not root: return root
+        self.func(root)
+        return root
+
+    def func(self,root):
+        left,right = root.left,root.right
+        if left:
+            left.next = right
+            right.next = root.next.left if root.next else None
+            self.func(root.left)
+            self.func(root.right)
+
+
+54. 二叉树中的最大路径和
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def maxPathSum(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        def func(root):
+            if not root.left and not root.right:
+                return root.val,root.val
+            if not root.left or not root.right:
+                left = root.left or root.right
+                left,res_l = func(left)
+                return max(left+root.val,root.val),max(left,res_l,left+root.val,root.val)
+            else:
+                left,res_l = func(root.left)
+                right,res_r = func(root.right)
+                return max(max(left,right),0)+root.val,max(left,right,res_l,res_r,left+right+root.val)
+        
+        return max(func(root))
+
+55. 验证回文串
+class Solution(object):
+    def isPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        s = [ch.lower() for ch in s if ch.isalnum()]
+        if not s: return True
+        i,j = 0,len(s)-1
+        while(i<j and s[i]==s[j]):
+            i += 1
+            j -= 1
+        return True if i>=j else False
+
+56. 单词接龙
+# 这个可以采用'*ab','g*b'
+class Solution(object):
+    def ladderLength(self, beginWord, endWord, wordList):
+        """
+        :type beginWord: str
+        :type endWord: str
+        :type wordList: List[str]
+        :rtype: int
+        """
+        word = {}
+        for i in wordList:
+            for j in range(len(i)):
+                s = i[:j]+'*'+i[j+1:]
+                if s in word:
+                    word[s].append(i)
+                else:
+                    word[s] = [i]
+        
+        count = 1
+        dict_all = {}
+        begin,sub = [beginWord],[]
+        while(begin):
+            begin_word = begin.pop()
+            for i in range(len(begin_word)):
+                now = begin_word[:i]+'*'+begin_word[i+1:]
+                if now in word and now not in dict_all:
+                    if endWord in word[now]:
+                        return count+1
+                    sub += word[now]
+                    dict_all[now] = 1
+            if not begin:
+                count += 1
+                begin = sub
+                sub = []
+        return 0
+
+57. 最长连续序列 
+class Solution(object):
+    def longestConsecutive(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums: return 0
+        dict_all = {}
+        for i in nums:
+            dict_all[i] = 1
+        res,max_res = 1,1
+        for i in nums:
+            if i-1 not in dict_all:
+                while(i+1 in dict_all):
+                    i += 1
+                    res += 1
+                if res>max_res:
+                    max_res = res
+                res = 1
+        return max_res
+
+58. 朋友圈（并查集）
+class Solution(object):
+    def findCircleNum(self, M):
+        """
+        :type M: List[List[int]]
+        :rtype: int
+        """
+        n = len(M)
+        res,visit = 0,set()
+        for i in range(n):
+            if i not in visit:
+                sub = [i]
+                while(sub):
+                    now = sub.pop()
+                    for j in range(n):
+                        if M[now][j] and j not in visit:
+                            visit.add(j)
+                            sub.append(j)
+                res += 1
+        return res
+
+59. 分割回文串
+class Solution(object):
+    def partition(self, s):
+        """
+        :type s: str
+        :rtype: List[List[str]]
+        """
+        if not s:
+            return [[]]
+        if len(s)==1:
+            return [[s]]
+        res_now = []
+        for i in range(1,len(s)+1):
+            if s[:i]==s[:i][::-1]:
+                next_res = self.partition(s[i:])
+                for j in next_res:
+                    j = [s[:i]]+j
+                    res_now.append(j)
+        return res_now
+
+
+60. 加油站
+# 这个是可以直接一次遍历给出来结果的。
+class Solution(object):
+    def canCompleteCircuit(self, gas, cost):
+        """
+        :type gas: List[int]
+        :type cost: List[int]
+        :rtype: int
+        """
+        v = []
+        for i in range(len(gas)):
+            v.append(gas[i]-cost[i])
+        v *= 2
+        i = 0
+        while(i<len(gas)):
+            if v[i]<0:
+                i += 1
+            else:
+                j,sum_now = i,0
+                while(j-i<len(gas)):
+                    sum_now += v[j]
+                    if sum_now<0:
+                        break
+                    j += 1
+                if sum_now>=0:
+                    return i
+                i = j+1
+        return -1
+
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, x, next=None, random=None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+"""
+61. 复杂链表复制
+class Solution(object):
+    def __init__(self):
+        self.flag = {}
+    def copyRandomList(self, head):
+        """
+        :type head: Node
+        :rtype: Node
+        """
+        if not head:
+            return None
+        if head in self.flag:
+            return self.flag[head]
+        new = Node(head.val)
+        self.flag[head] = new
+        new.random = self.copyRandomList(head.random)
+        new.next = self.copyRandomList(head.next)
+        return new
+
+62. 单词拆分
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        """
+        :type s: str
+        :type wordDict: List[str]
+        :rtype: bool
+        """
+        dict_all = {}
+        for i in wordDict:
+            word = dict_all
+            for j in i:
+                word[j] = word.setdefault(j,{})
+                word = word[j]
+            word['end'] = True
+
+        stack = [0]
+        while(stack):
+            i = stack.pop()
+            word = dict_all
+            while(i<len(s) and s[i] in word):
+                word = word[s[i]]
+                if 'end' in word:
+                    if i==len(s)-1:
+                        return True
+                    stack.append(i+1)
+                i += 1
+        return False
