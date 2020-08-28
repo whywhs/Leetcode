@@ -1439,3 +1439,329 @@ class Solution(object):
                     stack.append(i+1)
                 i += 1
         return False
+
+63.环形链表
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def hasCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: bool
+        """
+        if not head:
+            return False
+        slow,fast = head,head
+        while(slow and fast and fast.next):
+            slow = slow.next
+            fast = fast.next.next
+            if slow==fast:
+                return True
+        return False
+
+64. 排序链表
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def sortList(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        if not head:
+            return None
+        slow,fast = head,head
+        pre = None
+        while(slow and fast and fast.next):
+            pre = slow
+            slow = slow.next
+            fast = fast.next.next
+        if not pre:
+            return head
+        pre.next = None
+        left = self.sortList(head)
+        right = self.sortList(slow)
+        if not left or not right:
+            return left or right
+        if left.val>right.val:
+            left,right = right,left
+        a,b = left,right
+        pre = None
+        while(a and b):
+            while(a and b and a.val<=b.val):
+                pre = a
+                a = a.next
+            pre.next = b
+            while(a and b and a.val>b.val):
+                pre = b
+                b = b.next
+            if a: pre.next = a
+        return left
+
+
+65. 逆波兰表达式求值
+class Solution:
+    def evalRPN(self, tokens: List[str]) -> int:
+        stack = []
+        for i in range(len(tokens)):
+            try:
+                now = int(tokens[i])
+                stack.append(now)
+            except:
+                a = int(stack.pop())
+                b = int(stack.pop())
+                if tokens[i]=='+':
+                    stack.append(b+a)
+                elif tokens[i]=='-':
+                    stack.append(b-a)
+                elif tokens[i]=='*':
+                    stack.append(b*a)
+                else:
+                    stack.append(int(b/a))
+        return stack[-1]
+
+
+66.乘积最大子数组
+# 这个题目的思路很巧妙。直接一次遍历就可以得到结果。方法就是在遍历的过程中记录两个值分别是最小值
+# 和最大值。之所以记录这两个值是因为最小值*当前值很有可能变成最大值。
+# 同时还需要注意一点就是，pre——max不能直接更新，因为它在下面还被用到了。
+class Solution(object):
+    def maxProduct(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        pre_max,pre_min = 1,1
+        res = float('-inf')
+        for i in range(len(nums)):
+            now_pre_max = max(nums[i],nums[i]*pre_max,nums[i]*pre_min)
+            now_pre_min = min(nums[i],nums[i]*pre_max,nums[i]*pre_min)
+            pre_max = now_pre_max
+            pre_min = now_pre_min
+            if pre_max>res:
+                res = pre_max
+        return res
+
+
+67.最小栈
+class MinStack(object):
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.mylist1 = []
+        self.mylist2 = []
+
+
+    def push(self, x):
+        """
+        :type x: int
+        :rtype: None
+        """
+        self.mylist1.append(x)
+        if not self.mylist2:
+            self.mylist2.append(x)
+        else:
+            if x<self.mylist2[-1]:
+                self.mylist2.append(x)
+            else:
+                self.mylist2.append(self.mylist2[-1])
+
+    def pop(self):
+        """
+        :rtype: None
+        """
+        if self.mylist1:
+            self.mylist1.pop()
+            self.mylist2.pop()
+
+
+    def top(self):
+        """
+        :rtype: int
+        """
+        return self.mylist1[-1]
+
+
+    def getMin(self):
+        """
+        :rtype: int
+        """
+        return self.mylist2[-1]
+
+68. 相交链表
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def getIntersectionNode(self, headA, headB):
+        """
+        :type head1, head1: ListNode
+        :rtype: ListNode
+        """
+        if not headA or not headB: return None
+        a,b = headA,headB
+        while(a!=b):
+            a = a.next
+            b = b.next
+            if not a and not b:
+                return None
+            if not a:
+                a = headB
+            if not b:
+                b = headA
+        return a
+
+
+69. 寻找峰值
+class Solution(object):
+    def findPeakElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums)<2:
+            return 0
+        if nums[0]>nums[1]: return 0
+        if nums[-1]>nums[-2]: return len(nums)-1
+        i,j = 0,len(nums)-1
+        while(i<=j):
+            mid = (i+j)//2
+            if nums[mid-1]<nums[mid] and nums[mid+1]<nums[mid]:
+                return mid
+            if nums[mid-1]>nums[mid]:
+                j = mid-1
+            elif nums[mid+1]>nums[mid]:
+                i = mid+1
+        return 
+
+70. 分数到小数
+class Solution(object):
+    def fractionToDecimal(self, numerator, denominator):
+        """
+        :type numerator: int
+        :type denominator: int
+        :rtype: str
+        """
+        if numerator==0:
+            return '0'
+        flag = 1
+        if numerator*denominator<0:
+            flag = -1
+        numerator,denominator = abs(numerator),abs(denominator)
+        res = '' if flag==1 else '-'
+        k,dict_my = 0,{}
+        while(True):
+            a = numerator//denominator
+            res += str(a)
+            numerator -= denominator*a
+            if numerator==0:
+                return res
+            if k==0: 
+                res += '.'
+                k += 1
+            numerator *= 10
+            if numerator in dict_my:
+                return res[:dict_my[numerator]]+'('+res[dict_my[numerator]:]+')'
+            dict_my[numerator] = len(res)
+
+71. 多数元素 
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        a,time = nums[0],1
+        for i in range(1,len(nums)):
+            if a==nums[i]:
+                time += 1
+            else:
+                time -= 1
+                if time==0:
+                    a = nums[i+1]
+        return a
+
+72. Excel表列序号
+class Solution(object):
+    def titleToNumber(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        word = {chr(s):s-ord('A')+1 for s in range(ord('A'),ord('Z')+1)}
+        res = 0
+        for i in range(len(s)):
+            res += word[s[-i-1]]*(26**i)
+        return res
+
+73. 阶乘后的零
+class Solution(object):
+    def trailingZeroes(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        res = 0
+        while(n>=5):
+            n /= 5
+            res += n
+        return res
+
+74. 最大数
+class Solution(object):
+    def largestNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: str
+        """
+        nums = map(str,nums)
+        self.quicksort(nums,0,len(nums)-1)
+        return '0' if nums[-1]=='0' else ''.join(nums[::-1])
+    
+    def quicksort(self,nums,start,end):
+        i,j = start,end
+        if i<j:
+            base = nums[i]
+            while(i<j):
+                while(i<j and int(base+nums[j])<=int(nums[j]+base)):
+                    j -= 1
+                nums[i] = nums[j]
+                while(i<j and int(nums[i]+base)<int(base+nums[i])):
+                    i += 1
+                nums[j] = nums[i]
+            nums[i] = base
+            self.quicksort(nums,start,i-1)
+            self.quicksort(nums,j+1,end)
+
+75. 旋转数组
+class Solution(object):
+    def rotate(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        def reverse(start,end):
+            mid = (end-start+1)//2
+            for i in range(mid):
+                nums[start+i],nums[end-i] = nums[end-i],nums[start+i]
+        
+        if len(nums)<2:
+            return nums
+        k = k%(len(nums))
+        reverse(0,len(nums)-1)
+        reverse(0,k-1)
+        reverse(k,len(nums)-1)
