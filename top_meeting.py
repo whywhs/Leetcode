@@ -1765,3 +1765,457 @@ class Solution(object):
         reverse(0,len(nums)-1)
         reverse(0,k-1)
         reverse(k,len(nums)-1)
+
+76. 颠倒二进制位
+class Solution:
+    # @param n, an integer
+    # @return an integer
+    def reverseBits(self, n):
+        b = bin(n)[2:]
+        len_now = 32-len(b)
+        b = '0'*len_now+b
+        res = 0
+        for i in range(len(b)):
+            res += int(b[i])*(2**i)
+        return res
+
+77. 位1的个数
+class Solution(object):
+    def hammingWeight(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        res = 0
+        while(n):
+            if n%2==1:
+                res += 1
+            n >>= 1
+        return res
+
+78. 打家劫舍
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums: return 0
+        if len(nums)==1: return nums[0]
+        res = [0]*len(nums)
+        res[0] = nums[0]
+        res[1] = max(nums[0],nums[1])
+        for i in range(2,len(nums)):
+            res[i] = max(res[i-1],res[i-2]+nums[i])
+        return res[-1]
+
+79. 岛屿数量
+class Solution(object):
+    def numIslands(self, grid):
+        """
+        :type grid: List[List[str]]
+        :rtype: int
+        """
+        if not grid: return 0
+        res = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j]=='1':
+                    stack = [(i,j)]
+                    while(stack):
+                        x,y = stack.pop()
+                        if x>=0 and y>=0 and x<len(grid) and y<len(grid[0]) and grid[x][y]=='1':
+                            grid[x][y] = '2'
+                            stack += [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
+                    res += 1
+        return res
+
+80. 计数质数
+class Solution(object):
+    def countPrimes(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n<=2:
+            return 0
+        flag,count = {},0
+        right = int(n**0.5)+1
+        for i in range(2,right):
+            if i in flag:
+                continue
+            k = 2
+            while(i*k<n):
+                now = i*k
+                k += 1
+                if now not in flag:
+                    flag[now] = 1
+                    count += 1
+        return n-2-count
+
+81. 前缀树
+class Trie(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.tree = {}
+
+
+    def insert(self, word):
+        """
+        Inserts a word into the trie.
+        :type word: str
+        :rtype: None
+        """
+        now = self.tree
+        for i in word:
+            now[i] = now.setdefault(i,{})
+            now = now[i]
+        now['end']=True 
+
+
+    def search(self, word):
+        """
+        Returns if the word is in the trie.
+        :type word: str
+        :rtype: bool
+        """
+        now = self.tree
+        for i in word:
+            if i in now:
+                now = now[i]
+            else:
+                return False
+        return True if 'end' in now else False
+
+
+    def startsWith(self, prefix):
+        """
+        Returns if there is any word in the trie that starts with the given prefix.
+        :type prefix: str
+        :rtype: bool
+        """
+        now = self.tree
+        for i in prefix:
+            if i in now:
+                now = now[i]
+            else:
+                return False
+        return True
+
+82. 数组中的第K个元素
+# 这个的关键在于建堆操作。这里要学习一下，建堆是从底向上进行的。对于数组nums来说，建堆
+# 操作只需要从len(nums)//2-1这个地方开始即可。因为这个的子节点就是最后一个数。
+# 同时，对这个数进行左右节点的判断。如果左右节点均比当前节点小，则终止。否则替换之后
+# 还会继续对替换后的节点进行交换。
+class Solution(object):
+    def findKthLargest(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        # 建堆过程
+        def heapq(nums,start,end):
+            max_now = start
+            while(True):
+                if start*2+1<=end and nums[start*2+1]>nums[max_now]:
+                    max_now = start*2+1
+                if start*2+2<=end and nums[start*2+2]>nums[max_now]:
+                    max_now = start*2+2
+                if max_now==start:
+                    break
+                nums[max_now],nums[start] = nums[start],nums[max_now]
+                start = max_now
+        
+        # 只需要对len(nums)//2-1位置开始的数进行分步建堆即可。因为该数的2i+2就是len(nums)了
+        for i in range(len(nums)//2-1,-1,-1):
+            heapq(nums,i,len(nums)-1)
+
+        while(k!=1):
+            nums[0],nums[-1] = nums[-1],nums[0]
+            nums.pop()
+            heapq(nums,0,len(nums)-1)
+            k -= 1
+        return nums[0]
+
+83. 基本计算器II
+class Solution(object):
+    def calculate(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        stack,i = [],0
+        op = False
+        flag = 1
+        while(i<len(s)):
+            if s[i]==' ':
+                i += 1
+                continue
+            if s[i].isdigit():
+                num = 0
+                while(i<len(s) and (s[i].isdigit() or s[i]==' ')):
+                    if s[i]==' ':
+                        i += 1
+                        continue
+                    num = int(s[i])+num*10
+                    i += 1
+                if op=='*':
+                    left = stack.pop()
+                    stack.append(left*num)
+                    op = False
+                elif op=='/':
+                    left = stack.pop()
+                    stack.append(int(left/float(num)))
+                    op = False
+                else:
+                    stack.append(num*flag)
+            if i<len(s) and s[i] in '+-*/':
+                if s[i]=='-':
+                    flag = -1
+                elif s[i]=='*':
+                    op = '*'
+                elif s[i]=='/':
+                    op = '/'
+                else:
+                    flag = 1
+            i += 1
+        return sum(stack)
+
+84. 二叉搜索树中第k小的元素
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def kthSmallest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        stack = []
+        while(root):
+            stack.append(root)
+            root = root.left
+        while(stack):
+            now = stack.pop()
+            k -= 1
+            if k==0:
+                return now.val
+            if now.right:
+                now = now.right
+                while(now):
+                    stack.append(now)
+                    now = now.left
+        return 
+
+85. 回文链表
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def isPalindrome(self, head):
+        """
+        :type head: ListNode
+        :rtype: bool
+        """
+        if not head or not head.next: return True
+        if not head.next.next: return head.val==head.next.val
+        slow,fast = head,head
+        k = 0
+        while(fast and fast.next):
+            k += 1
+            fast = fast.next.next
+            pre = slow
+            slow = slow.next
+        new = self.reverse(slow)
+        while(head and new and head.val==new.val):
+            head = head.next
+            new = new.next
+        return False if head and new else True
+
+    def reverse(self,head):
+        new = None
+        while(head):
+            head.next,new,head = new,head,head.next
+        return new
+
+86. 二叉树的最近公共祖先
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        if not root:
+            return 
+        if root.val==p.val or root.val==q.val:
+            return root
+        left = self.lowestCommonAncestor(root.left,p,q)
+        right = self.lowestCommonAncestor(root.right,p,q)
+        if left and right:
+            return root
+        return left or right
+
+87. 删除链表中的节点
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def deleteNode(self, node):
+        """
+        :type node: ListNode
+        :rtype: void Do not return anything, modify node in-place instead.
+        """
+        node.val = node.next.val
+        node.next = node.next.next
+
+
+88. 除自身以外数组的乘积
+class Solution(object):
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        res = [0]*len(nums)
+        res[0] = nums[0]
+        for i in range(1,len(nums)):
+            res[i] = res[i-1]*nums[i]
+        for j in range(len(nums)-1,-1,-1):
+            if j==len(nums)-1:
+                res[j] = res[j-1]
+                now = nums[j]
+            elif j==0:
+                res[j] = now
+            else:
+                res[j] = res[j-1]*now
+                now *= nums[j]
+        return res
+
+
+89. 滑动窗口最大值
+class Solution(object):
+    def maxSlidingWindow(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        if not nums or k==1: return nums
+        idx,res = [0],[]
+        min_now = [nums[0]]
+        for i in range(1,len(nums)):
+            if i-idx[0]==k:
+                idx.pop(0)
+                min_now.pop(0)
+            while(min_now and nums[i]>min_now[-1]):
+                min_now.pop()
+                idx.pop()
+            min_now.append(nums[i])
+            idx.append(i)
+            if i>=k-1:
+                res.append(min_now[0])
+        return res
+
+90. 完全平方数
+class Solution(object):
+    def numSquares(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        res = [1 if int(i**0.5)==i**0.5 else float('inf') for i in range(n+1)]
+        for i in range(n+1):
+            if res[i] == 1:
+                continue
+            else:
+                j = 1
+                while(j*j<=i):
+                    res[i] = min(res[i-j*j]+1,res[i])
+                    j += 1
+        return res[-1]
+
+91. 移动0
+class Solution(object):
+    def moveZeroes(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        i,j = 0,0
+        for i in range(len(nums)):
+            if nums[i]!=0:
+                nums[i],nums[j] = nums[j],nums[i]
+                j += 1
+
+
+92. 寻找重复数
+# 类似于一个龟兔赛跑的问题。求循环链表的入口节点。
+class Solution(object):
+    def findDuplicate(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        slow,fast = 0,0
+        while(True):
+            slow = nums[slow]
+            fast = nums[nums[fast]]
+            if slow==fast:
+                break
+        new = 0
+        while(new!=slow):
+            slow = nums[slow]
+            new = nums[new]
+        return new
+
+93. 生命游戏
+class Solution(object):
+    def gameOfLife(self, board):
+        """
+        :type board: List[List[int]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+        def count(i,j):
+            stack = [(i,j+1),(i,j-1),(i+1,j),(i-1,j),(i+1,j+1),(i+1,j-1),(i-1,j+1),(i-1,j-1)]
+            num = 0
+            while(stack):
+                x,y = stack.pop()
+                if x>=0 and x<m and y>=0 and y<n and board[x][y]==1:
+                    num += 1
+            return True if num==3 or (num==2 and board[i][j]==1) else False
+
+        def judge(i,j):
+            flag = count(i,j)
+            if j+1<n:
+                judge(i,j+1)
+            else:
+                if i+1<m:
+                    judge(i+1,0)
+            board[i][j] = 1 if flag else 0
+        
+        m,n = len(board),len(board[0])
+        if m and n:
+            judge(0,0)
