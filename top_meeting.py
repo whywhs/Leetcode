@@ -2219,3 +2219,32 @@ class Solution(object):
         m,n = len(board),len(board[0])
         if m and n:
             judge(0,0)
+
+
+94. 最长上升子序列
+# 这个题目的原理就相当于，如果本身数组是[a,b,c,d]，那么我新来了一个e。如果e可以进行替换，
+# 那么就可以替换，这样，所有可以在之后append的数，无论对于e还是对于被替换的都是可以算上一个
+# 长度的。即因为他是替换，而不是累加，这种做法就可以得到正确的长度。但是对于得到正确的序列，这种做法
+# 是不可以的。
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if not nums: return 0
+        res = [nums[0]]
+        max_len = 0
+        for i in range(1,len(nums)):
+            if nums[i]>res[-1]:
+                res.append(nums[i])
+            else:
+                j,k = 0,len(res)-1
+                while(j<k):
+                    mid = (j+k)//2
+                    if res[mid]>=nums[i]:
+                        k = mid
+                    else:
+                        j = mid+1
+                res[j] = nums[i]
+        return len(res)
